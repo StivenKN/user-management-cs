@@ -1,13 +1,14 @@
 ﻿using System.Linq.Expressions;
+using BCrypt.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using UserManagement.Data.Repositories;
+using UserManagement.Data.Repositories.Users;
 using UserManagement.Model;
 
 namespace user_management.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [ApiController]
     public class UserController(IUserRepository userRepository) : ControllerBase
     {
@@ -28,6 +29,7 @@ namespace user_management.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] User user)
         {
+            user.UserPassword = BCrypt.Net.BCrypt.HashPassword(user.UserPassword);
             if (user == null)
                 return BadRequest();
 
@@ -42,6 +44,7 @@ namespace user_management.Controllers
         [HttpPatch]
         public async Task<IActionResult> UpdateUser([FromBody] User user)
         {
+            user.UserPassword = BCrypt.Net.BCrypt.HashPassword(user.UserPassword);
             if (user == null)
                 return BadRequest();
 

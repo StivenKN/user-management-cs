@@ -1,5 +1,8 @@
+using System.Configuration;
+using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
-using UserManagement.Data.Repositories;
+using UserManagement.Data;
+using UserManagement.Data.Repositories.Users;
 
 namespace user_management
 {
@@ -15,12 +18,18 @@ namespace user_management
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            var connectionString = builder.Configuration.GetConnectionString("MySQLConnection");
+
             builder
                 .Services
-                .AddSingleton(
-                    new MySqlConnection(
-                        builder.Configuration.GetConnectionString("MySQLConnection")
-                    )
+                .AddDbContext<Context>(
+                    options =>
+                        options.UseMySql(
+                            connectionString,
+                            new MySqlServerVersion(new Version(8, 0, 35)),
+                            null
+                        )
                 );
 
             builder.Services.AddScoped<IUserRepository, UserRepository>();
